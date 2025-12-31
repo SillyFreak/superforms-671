@@ -5,8 +5,16 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+        os: [ubuntu-latest, windows-latest]
+        # scenario: [a, a1, a2, a3, b, b1, b2, b3]
+        scenario: [a, b]
+
+    name: Node ${{ matrix.node-version }} on ${{ matrix.os }}, scenario ${{ matrix.scenario }}
+    runs-on: ${{ matrix.os }}
 
     permissions:
       contents: read
@@ -23,13 +31,13 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ matrix.node-version }}
 
       - name: Log Node & NPM versions
         run: node --version && npm --version
 
       - name: Install scenario
-        run: just scenario-b
+        run: just scenario-${{ matrix.scenario }}
 
       - name: Build scenario
         run: npm run build
