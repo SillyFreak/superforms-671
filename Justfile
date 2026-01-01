@@ -16,9 +16,6 @@ init-project:
 install-superforms:
 	npm i -D sveltekit-superforms@2.29.1 zod
 
-run:
-	npm run dev
-
 # scenarios
 
 scenario-a:
@@ -68,3 +65,24 @@ scenario-b3:
 	@just install-superforms
 	rm -rf package-lock.json
 	npm i
+
+# orchestration
+
+run:
+	npm run dev
+
+reset:
+	git checkout "main"
+	rm -rf node_modules/ .svelte-kit/
+
+record-scenario NAME RESULT:
+	git checkout -b "scenario-{{NAME}}"
+	@just "scenario-{{NAME}}"
+	git add .
+	git commit -m "scenario-{{NAME}} ({{RESULT}})"
+	@just run
+
+delete-scenario NAME:
+	git checkout "main"
+	rm -rf node_modules/ .svelte-kit/
+	git branch -d "scenario-{{NAME}}"
